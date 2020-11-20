@@ -1,8 +1,0 @@
-{
-  "url": "redshift-udacity-scpro2.cwfaavi1fb7o.us-east-2.redshift.amazonaws.com",
-  "clusterId": "redshift-udacity-scpro2",
-  "dbname": "dev",
-  "port": "5439",
-  "user": "redshiftuser",
-  "password": "UdacityRedshiftProject1"
-}

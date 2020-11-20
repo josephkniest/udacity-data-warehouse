@@ -1,7 +1,9 @@
 from boto3.session import Session
 import boto3
 import json
-import sqlalchemy as sa
+import configparser
+import psycopg2
+
 def aws_module(resource):
     file = open('./creds.json', "r")
     creds = json.loads(file.read())
@@ -9,11 +11,11 @@ def aws_module(resource):
     return boto3.resource(resource, aws_access_key_id=creds['keyId'], aws_secret_access_key=creds['keySec'])
 
 def connect_redshift():
-    file = open('./redshift.json', "r")
-    redshift = json.loads(file.read())
-    file.close()
-    u = 'redshift+psycopg2://redshiftuser:UdacityRedshiftProject1@redshift-udacity-scpro2.cwfaavi1fb7o.us-east-2.redshift.amazonaws.com5439/dev'
-    print(sa.create_engine(u))
+    config = configparser.ConfigParser()
+    config.read('redshift.cfg')
+    conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
+    cur = conn.cursor()
+    conn.close()
 
 def main():
     connect_redshift()
