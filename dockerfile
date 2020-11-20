@@ -22,6 +22,10 @@ RUN pip3 install boto3
 
 RUN pip3 install ipython-sql
 
+RUN pip3 install --user sqlalchemy
+
+RUN pip3 install --user sqlalchemy-redshift
+
 # Drop udacity project files into image
 
 RUN mkdir /root/udacity
