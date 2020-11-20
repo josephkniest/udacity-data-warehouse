@@ -1,0 +1,6 @@
+{
+  "clusterId": "redshift-udacity-scpro2",
+  "port": 5439,
+  "user": "redshiftuser",
+  "password": "UdacityRedshiftProject1"
+}
