@@ -25,7 +25,34 @@ def connect_redshift():
     cur.execute("""
         create table if not exists users (
             user_id varchar(16) not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            gender varchar(16) not null,
+            level varchar(16) not null,
             primary key(user_id)
+        )
+    """)
+
+    cur.execute("""
+        create table if not exists artists (
+            artist_id varchar(16) not null,
+            name varchar(16) not null,
+            location varchar(16) not null,
+            lattitude integer not null,
+            longitude integer not null,
+            primary key(artist_id)
+        )
+    """)
+
+    cur.execute("""
+        create table if not exists songs (
+            song_id varchar(16) not null,
+            title varchar(16) not null,
+            artist_id varchar(16) not null,
+            year integer,
+            duration float,
+            primary key(song_id),
+            foreign key(artist_id) references artists(artist_id)
         )
     """)
 
