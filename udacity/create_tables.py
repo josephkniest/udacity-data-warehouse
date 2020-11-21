@@ -15,14 +15,44 @@ def connect_redshift():
     config.read('redshift.cfg')
     conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
     cur = conn.cursor()
+
+    cur.execute('drop table if exists songplays')
+    cur.execute('drop table if exists users')
+    cur.execute('drop table if exists songs')
+    cur.execute('drop table if exists artists')
+    cur.execute('drop table if exists time')
+
+    cur.execute("""
+        create table if not exists users (
+            user_id varchar(16) not null,
+            primary key(user_id)
+        )
+    """)
+
+    cur.execute("""
+        create table if not exists songplays (
+            songplay_id integer not null,
+            start_time integer not null,
+            user_id varchar(16) not null,
+            level varchar(16),
+            song_id varchar(16) not null,
+            artist_id varchar(16) not null,
+            session_id integer,
+            location varchar(16),
+            user_agent varchar(16),
+            primary key(songplay_id),
+            foreign key(user_id) references users(user_id)
+        )
+    """)
+
     conn.close()
 
 def main():
     connect_redshift()
     s3 = aws_module('s3')
-    bucket = s3.Bucket('scpro2-udacity-data-engineering')
-    for obj in bucket.objects.all():
-        print(obj.key, '->', obj.get()['Body'].read())
+    #bucket = s3.Bucket('scpro2-udacity-data-engineering')
+    #for obj in bucket.objects.all():
+        #print(obj.key, '->', obj.get()['Body'].read())
 
 if __name__ == "__main__":
     main()
