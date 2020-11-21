@@ -68,7 +68,9 @@ def connect_redshift():
             location varchar(16),
             user_agent varchar(16),
             primary key(songplay_id),
-            foreign key(user_id) references users(user_id)
+            foreign key(user_id) references users(user_id),
+            foreign key(artist_id) references artists(artist_id),
+            foreign key(song_id) references songs(song_id)
         )
     """)
 
