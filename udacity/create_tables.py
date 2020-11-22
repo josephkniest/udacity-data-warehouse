@@ -61,7 +61,7 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists songplays (
-            songplay_id integer not null,
+            songplay_id integer not null identity(1, 1),
             start_time integer not null,
             user_id varchar(16) not null,
             level varchar(16),
@@ -79,7 +79,7 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists time (
-            time_id integer not null,
+            time_id integer not null identity(1, 1),
             start_time integer not null,
             hour integer not null,
             day integer not null,
