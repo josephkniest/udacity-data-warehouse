@@ -74,6 +74,20 @@ def connect_redshift():
         )
     """)
 
+    cur.execute("""
+        create table if not exists time (
+            time_id integer not null,
+            start_time integer not null,
+            hour integer not null,
+            day integer not null,
+            week integer not null,
+            month integer not null,
+            year integer not null,
+            weekday integer not null,
+            primary key(time_id)
+        )
+    """)
+
     conn.close()
 
 def main():
