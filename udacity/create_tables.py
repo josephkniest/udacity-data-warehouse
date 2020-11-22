@@ -25,8 +25,10 @@ def reset_tables():
     cur.execute('drop table if exists artists')
     cur.execute('drop table if exists time')
 
+    cur.execute('create schema s authorization redshiftuser')
+
     cur.execute("""
-        create table if not exists users (
+        create table if not exists public.users (
             user_id varchar(16) not null,
             first_name varchar(16) not null,
             last_name varchar(16) not null,
@@ -37,7 +39,7 @@ def reset_tables():
     """)
 
     cur.execute("""
-        create table if not exists artists (
+        create table if not exists public.artists (
             artist_id varchar(16) not null,
             name varchar(16) not null,
             location varchar(16) not null,
@@ -48,19 +50,19 @@ def reset_tables():
     """)
 
     cur.execute("""
-        create table if not exists songs (
+        create table if not exists public.songs (
             song_id varchar(16) not null,
             title varchar(16) not null,
             artist_id varchar(16) not null,
             year integer,
             duration float,
             primary key(song_id),
-            foreign key(artist_id) references artists(artist_id)
+            foreign key(artist_id) references public.artists(artist_id)
         )
     """)
 
     cur.execute("""
-        create table if not exists songplays (
+        create table if not exists public.songplays (
             songplay_id integer not null identity(1, 1),
             start_time integer not null,
             user_id varchar(16) not null,
@@ -71,14 +73,14 @@ def reset_tables():
             location varchar(16),
             user_agent varchar(16),
             primary key(songplay_id),
-            foreign key(user_id) references users(user_id),
-            foreign key(artist_id) references artists(artist_id),
-            foreign key(song_id) references songs(song_id)
+            foreign key(user_id) references public.users(user_id),
+            foreign key(artist_id) references public.artists(artist_id),
+            foreign key(song_id) references public.songs(song_id)
         )
     """)
 
     cur.execute("""
-        create table if not exists time (
+        create table if not exists public.time (
             time_id integer not null identity(1, 1),
             start_time integer not null,
             hour integer not null,
@@ -90,6 +92,10 @@ def reset_tables():
             primary key(time_id)
         )
     """)
+
+    cur.execute('select * from pg_namespace')
+    for rec in cur:
+        print(rec)
 
     conn.close()
 
