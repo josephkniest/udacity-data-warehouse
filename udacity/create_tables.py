@@ -13,7 +13,10 @@ def aws_module(resource):
 def connect_redshift():
     config = configparser.ConfigParser()
     config.read('redshift.cfg')
-    conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
+    return psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
+
+def reset_tables():
+    conn = connect_redshift()
     cur = conn.cursor()
 
     cur.execute('drop table if exists songplays')
@@ -91,11 +94,7 @@ def connect_redshift():
     conn.close()
 
 def main():
-    connect_redshift()
-    s3 = aws_module('s3')
-    #bucket = s3.Bucket('scpro2-udacity-data-engineering')
-    #for obj in bucket.objects.all():
-        #print(obj.key, '->', obj.get()['Body'].read())
+    reset_tables()
 
 if __name__ == "__main__":
     main()
