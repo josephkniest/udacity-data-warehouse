@@ -50,7 +50,7 @@ def reset_tables():
     cur.execute("""
         create table if not exists public.songs (
             song_id varchar(32) not null,
-            title varchar(32) not null,
+            title varchar(128) not null,
             artist_id varchar(32) not null,
             year integer,
             duration float,

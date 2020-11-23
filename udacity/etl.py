@@ -19,6 +19,19 @@ def process_song(file, conn):
     print(sql)
     cur.execute(sql)
 
+    sql = """
+        insert into public.songs (song_id, title, artist_id, year, duration)
+        values ('{}', '{}', '{}', {}, {})
+    """.format(
+        song['song_id'],
+        song['title'].replace("'", "''"),
+        song['artist_id'],
+        0 if song['year'] is None else song['year'],
+        0 if song['duration'] is None else song['duration'])
+
+    print(sql)
+    cur.execute(sql)
+
 
 def process_log(file, conn):
     print(file)
