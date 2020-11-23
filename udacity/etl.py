@@ -5,14 +5,20 @@ def process_song(file, conn):
     song = json.loads(file)
     print(song)
     cur = conn.cursor()
-    cur.execute('select * from pg_namespace')
-    for rec in cur:
-        print(rec)
 
-    cur.execute("""
-        insert into public.artists
-        values ({}, {}, {}, {}, {})
-    """.format(song['artist_id'], song['artist_name'], song['artist_location'], song['artist_latitude'], song['artist_longitude']))
+    sql = """
+        insert into public.artists (artist_id, name, location, lattitude, longitude)
+        values ('{}', '{}', '{}', {}, {})
+    """.format(
+        song['artist_id'],
+        song['artist_name'],
+        song['artist_location'],
+        0 if song['artist_latitude'] is None else song['artist_latitude'],
+        0 if song['artist_longitude'] is None else song['artist_longitude'])
+
+    print(sql)
+    cur.execute(sql)
+
 
 def process_log(file, conn):
     print(file)
@@ -27,6 +33,8 @@ def main():
         #if "log_data" in obj.key:
             #process_log(obj.get()['Body'].read())
 
+
+    conn.commit()
     conn.close()
 
 if __name__ == "__main__":

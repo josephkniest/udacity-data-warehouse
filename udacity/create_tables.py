@@ -19,30 +19,28 @@ def reset_tables():
     conn = connect_redshift()
     cur = conn.cursor()
 
-    cur.execute('drop table if exists songplays')
-    cur.execute('drop table if exists users')
-    cur.execute('drop table if exists songs')
-    cur.execute('drop table if exists artists')
-    cur.execute('drop table if exists time')
-
-    cur.execute('create schema s authorization redshiftuser')
+    cur.execute('drop table if exists public.songplays')
+    cur.execute('drop table if exists public.users')
+    cur.execute('drop table if exists public.songs')
+    cur.execute('drop table if exists public.artists')
+    cur.execute('drop table if exists public.time')
 
     cur.execute("""
         create table if not exists public.users (
-            user_id varchar(16) not null,
-            first_name varchar(16) not null,
-            last_name varchar(16) not null,
-            gender varchar(16) not null,
-            level varchar(16) not null,
+            user_id varchar(32) not null,
+            first_name varchar(32) not null,
+            last_name varchar(32) not null,
+            gender varchar(32) not null,
+            level varchar(32) not null,
             primary key(user_id)
         )
     """)
 
     cur.execute("""
         create table if not exists public.artists (
-            artist_id varchar(16) not null,
-            name varchar(16) not null,
-            location varchar(16) not null,
+            artist_id varchar(32) not null,
+            name varchar(128) not null,
+            location varchar(32) not null,
             lattitude integer not null,
             longitude integer not null,
             primary key(artist_id)
@@ -51,9 +49,9 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists public.songs (
-            song_id varchar(16) not null,
-            title varchar(16) not null,
-            artist_id varchar(16) not null,
+            song_id varchar(32) not null,
+            title varchar(32) not null,
+            artist_id varchar(32) not null,
             year integer,
             duration float,
             primary key(song_id),
@@ -65,13 +63,13 @@ def reset_tables():
         create table if not exists public.songplays (
             songplay_id integer not null identity(1, 1),
             start_time integer not null,
-            user_id varchar(16) not null,
-            level varchar(16),
-            song_id varchar(16) not null,
-            artist_id varchar(16) not null,
+            user_id varchar(32) not null,
+            level varchar(32),
+            song_id varchar(32) not null,
+            artist_id varchar(32) not null,
             session_id integer,
-            location varchar(16),
-            user_agent varchar(16),
+            location varchar(32),
+            user_agent varchar(32),
             primary key(songplay_id),
             foreign key(user_id) references public.users(user_id),
             foreign key(artist_id) references public.artists(artist_id),
@@ -93,10 +91,7 @@ def reset_tables():
         )
     """)
 
-    cur.execute('select * from pg_namespace')
-    for rec in cur:
-        print(rec)
-
+    conn.commit()
     conn.close()
 
 def main():
