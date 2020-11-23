@@ -53,3 +53,8 @@ time: Breakdowns of song play instance timestamps
   - month: Month of the year of the songplay
   - year: Year of the songplay
   - weekday: Day of the week, e.g. "Monday"
+
+## Creating the tables and inserting the data
+
+Reset tables with ```python3 create_tables.py```
+Insert data from S3 with ```python3 etl.py```

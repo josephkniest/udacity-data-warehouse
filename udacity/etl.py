@@ -34,17 +34,35 @@ def process_song(file, conn):
 
 
 def process_log(file, conn):
-    print(file)
+    jsonS = '[' + file.replace("}", "},")
+    jsonS = jsonS[:-1] + ']'
+    print(jsonS)
+    logs = json.loads(jsonS)
+    cur = conn.cursor()
+
+    for log in logs:
+        sql = """
+            insert into public.users (user_id, first_name, last_name, gender, level)
+            values ('{}', '{}', '{}', '{}', '{}')
+        """.format(
+            log['userId'],
+            log['firstName'],
+            log['lastName'],
+            log['gender'],
+            log['level'])
+
+        print(sql)
+        cur.execute(sql)
 
 def main():
     conn = connect_redshift()
     s3 = aws_module('s3')
     bucket = s3.Bucket('scpro2-udacity-data-engineering')
     for obj in bucket.objects.all():
-        if "song_data" in obj.key:
-            process_song(obj.get()['Body'].read(), conn)
-        #if "log_data" in obj.key:
-            #process_log(obj.get()['Body'].read())
+        #if "song_data" in obj.key:
+            #process_song(obj.get()['Body'].read(), conn)
+        if "log_data" in obj.key:
+            process_log(obj.get()['Body'].read().decode("utf-8"), conn)
 
 
     conn.commit()
