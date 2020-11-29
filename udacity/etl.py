@@ -38,34 +38,21 @@ def create_temp_tables(conn):
 
 def process_song(file, conn):
     song = json.loads(file)
-    print(song)
     cur = conn.cursor()
-
+    print(song)
     sql = """
-        insert into public.artists (artist_id, name, location, lattitude, longitude)
-        values ('{}', '{}', '{}', {}, {})
+        insert into stage_songs (artist_id, name, location, latitude, longitude, song_id, title, year, duration)
+        values ('{}', '{}', '{}', {}, {}, '{}', '{}', {}, {})
     """.format(
-        song['artist_id'],
-        song['artist_name'],
-        song['artist_location'],
-        0 if song['artist_latitude'] is None else song['artist_latitude'],
-        0 if song['artist_longitude'] is None else song['artist_longitude'])
-
-    print(sql)
-    cur.execute(sql)
-
-    sql = """
-        insert into public.songs (song_id, title, artist_id, year, duration)
-        values ('{}', '{}', '{}', {}, {})
-    """.format(
-        song['song_id'],
-        song['title'].replace("'", "''"),
-        song['artist_id'],
-        0 if song['year'] is None else song['year'],
-        0 if song['duration'] is None else song['duration'])
-
-    print(sql)
-    cur.execute(sql)
+        None if song['artist_id'] is None else song['artist_id'].replace("'", "''"),
+        None if song['artist_name'] is None else song['artist_name'].replace("'", "''"),
+        None if song['artist_location'] is None else song['artist_location'].replace("'", "''"),
+        None if song['artist_latitude'] is None else song['artist_latitude'],
+        None if song['artist_longitude'] is None else song['artist_longitude'],
+        None if song['song_id'] is None else song['song_id'].replace("'", "''"),
+        None if song['title'] is None else song['title'].replace("'", "''"),
+        None if song['year'] is None else song['year'],
+        None if song['duration'] is None else song['duration'])
 
 
 def process_log(file, conn):
@@ -100,10 +87,10 @@ def main():
     s3 = aws_module('s3')
     bucket = s3.Bucket('scpro2-udacity-data-engineering')
     for obj in bucket.objects.all():
-        #if "song_data" in obj.key:
-            #process_song(obj.get()['Body'].read(), conn)
-        if "log_data" in obj.key:
-            process_log(obj.get()['Body'].read().decode("utf-8"), conn)
+        if "song_data" in obj.key:
+            process_song(obj.get()['Body'].read(), conn)
+        #if "log_data" in obj.key:
+            #process_log(obj.get()['Body'].read().decode("utf-8"), conn)
 
 
     conn.commit()
