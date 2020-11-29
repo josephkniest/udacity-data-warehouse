@@ -19,45 +19,11 @@ def reset_tables():
     conn = connect_redshift()
     cur = conn.cursor()
 
-    cur.execute('drop table if exists stage_songs')
-    cur.execute('drop table if exists stage_events')
     cur.execute('drop table if exists public.songplays')
     cur.execute('drop table if exists public.users')
     cur.execute('drop table if exists public.songs')
     cur.execute('drop table if exists public.artists')
     cur.execute('drop table if exists public.time')
-
-    cur.execute("""
-        create temp table if not exists stage_songs (
-            artist_id varchar(32) not null,
-            name varchar(128) not null,
-            location varchar(32) not null,
-            latitude integer not null,
-            longitude integer not null,
-            song_id varchar(32) not null,
-            title varchar(128) not null,
-            year integer,
-            duration float
-        )
-    """)
-
-    cur.execute("""
-        create temp table if not exists logs (
-            log_id integer not null identity(1, 1),
-            start_time integer not null,
-            user_id varchar(32) not null,
-            level varchar(32),
-            song_id varchar(32) not null,
-            artist_id varchar(32) not null,
-            session_id integer,
-            location varchar(32),
-            user_agent varchar(32),
-            first_name varchar(32) not null,
-            last_name varchar(32) not null,
-            gender varchar(32) not null,
-            primary key(log_id)
-        )
-    """)
 
     cur.execute("""
         create table if not exists public.users (
