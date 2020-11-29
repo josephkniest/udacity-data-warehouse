@@ -19,19 +19,17 @@ def create_temp_tables(conn):
 
     cur.execute("""
         create temp table if not exists stage_logs (
-            log_id integer not null identity(1, 1),
             start_time bigint not null,
             user_id varchar(32) not null,
             level varchar(8),
-            song varchar(256),
-            artist varchar(256),
+            song_id varchar(32),
+            artist_id varchar(32),
             session_id integer,
             location varchar(64),
             user_agent varchar(256),
             first_name varchar(32),
             last_name varchar(32),
-            gender varchar(32),
-            primary key(log_id)
+            gender varchar(32)
         )
     """)
 
@@ -65,14 +63,14 @@ def process_log(file, conn):
     for log in logs:
         print(log)
         sql = """
-            insert into stage_logs (start_time, user_id, level, song, artist, session_id, location, user_agent, first_name, last_name, gender)
+            insert into stage_logs (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent, first_name, last_name, gender)
             values ({}, '{}', '{}', '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}')
         """.format(
             log['ts'],
             log['userId'].replace("'", "''"),
             log['level'].replace("'", "''"),
-            None if log['song'] is None else log['song'].replace("'", "''"),
-            None if log['artist'] is None else log['artist'].replace("'", "''"),
+            None if log['song'] is None else song_id_from_song_name(conn, log['song']),
+            None if log['artist'] is None else artist_id_from_artist_name(conn, log['artist']),
             log['sessionId'],
             None if log['location'] is None else log['location'].replace("'", "''"),
             None if log['userAgent'] is None else log['userAgent'].replace("'", "''"),
@@ -130,7 +128,8 @@ def insert_users_songplays(conn):
 
     cur.execute("""
         insert into public.songplays
-            select start_time, user_id, level, 
+            select start_time, user_id, level, song_id, artist_id, session_id, location, user_agent
+            from stage_logs
     """)
 
 def main():
@@ -141,14 +140,14 @@ def main():
     for obj in bucket.objects.all():
         if "song_data" in obj.key:
             process_song(obj.get()['Body'].read(), conn)
+
+    #for obj in bucket.objects.all():
         #if "log_data" in obj.key:
             #process_log(obj.get()['Body'].read().decode("utf-8"), conn)
 
 
     insert_artists_songs(conn)
-    print(song_id_from_song_name(conn, 'Soul Deep'))
-    #SOCIWDW12A8C13D406
-    print(artist_id_from_artist_name(conn, 'Kenny G featuring Daryl Hall'))
+    insert_users_songplays(conn)
     conn.commit()
 
     conn.close()
