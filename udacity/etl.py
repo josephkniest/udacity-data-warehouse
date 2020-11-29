@@ -81,6 +81,17 @@ def process_log(file, conn):
 
         cur.execute(sql)
 
+def insert_artists_songs(conn):
+    cur = conn.cursor()
+    sql = """
+        insert into public.artists
+            select artist_id, name, location, latitude, longitude
+            from stage_songs
+    """
+
+    cur.execute(sql)
+    conn.commit()
+
 def main():
     conn = connect_redshift()
     create_temp_tables(conn)
@@ -93,7 +104,9 @@ def main():
             #process_log(obj.get()['Body'].read().decode("utf-8"), conn)
 
 
+    insert_artists_songs(conn)
     conn.commit()
+
     conn.close()
 
 if __name__ == "__main__":
