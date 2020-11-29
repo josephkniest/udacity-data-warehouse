@@ -93,6 +93,17 @@ def insert_artists_songs(conn):
     """
 
     cur.execute(sql)
+
+    sql = """
+        insert into public.songs
+            select song_id, title, artist_id, year, duration
+            from stage_songs
+            left join public.songs using(song_id, title, artist_id, year, duration)
+            where public.songs.song_id is null
+    """
+
+    cur.execute(sql)
+
     conn.commit()
 
 def main():
