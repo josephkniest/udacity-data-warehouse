@@ -41,8 +41,8 @@ def reset_tables():
             artist_id varchar(32) not null,
             name varchar(128) not null,
             location varchar(32) not null,
-            latitude integer not null,
-            longitude integer not null,
+            latitude integer,
+            longitude integer,
             primary key(artist_id)
         )
     """)

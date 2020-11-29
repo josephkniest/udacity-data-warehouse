@@ -5,13 +5,13 @@ def create_temp_tables(conn):
     cur = conn.cursor()
     cur.execute("""
         create temp table if not exists stage_songs (
-            artist_id varchar(32) not null,
-            name varchar(128) not null,
-            location varchar(32) not null,
-            latitude integer not null,
-            longitude integer not null,
-            song_id varchar(32) not null,
-            title varchar(128) not null,
+            artist_id varchar(32),
+            name varchar(128),
+            location varchar(32),
+            latitude integer,
+            longitude integer,
+            song_id varchar(32),
+            title varchar(128),
             year integer,
             duration float
         )
@@ -42,8 +42,9 @@ def process_song(file, conn):
     print(song)
     sql = """
         insert into stage_songs (artist_id, name, location, latitude, longitude, song_id, title, year, duration)
-        values ('{}', '{}', '{}', {}, {}, '{}', '{}', {}, {})
-    """.format(
+        values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    cur.execute(sql, (
         None if song['artist_id'] is None else song['artist_id'].replace("'", "''"),
         None if song['artist_name'] is None else song['artist_name'].replace("'", "''"),
         None if song['artist_location'] is None else song['artist_location'].replace("'", "''"),
@@ -52,7 +53,7 @@ def process_song(file, conn):
         None if song['song_id'] is None else song['song_id'].replace("'", "''"),
         None if song['title'] is None else song['title'].replace("'", "''"),
         None if song['year'] is None else song['year'],
-        None if song['duration'] is None else song['duration'])
+        None if song['duration'] is None else song['duration']))
 
 
 def process_log(file, conn):
@@ -87,6 +88,8 @@ def insert_artists_songs(conn):
         insert into public.artists
             select artist_id, name, location, latitude, longitude
             from stage_songs
+            left join public.artists using(artist_id, name, location, latitude, longitude)
+            where public.artists.artist_id is null
     """
 
     cur.execute(sql)
