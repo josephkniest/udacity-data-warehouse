@@ -59,7 +59,6 @@ def process_log(file, conn):
     jsonS = jsonS[:-1] + ']'
     logs = json.loads(jsonS)
     cur = conn.cursor()
-
     for log in logs:
         print(log)
         sql = """
@@ -69,8 +68,8 @@ def process_log(file, conn):
             log['ts'],
             log['userId'].replace("'", "''"),
             log['level'].replace("'", "''"),
-            None if log['song'] is None else song_id_from_song_name(conn, log['song']),
-            None if log['artist'] is None else artist_id_from_artist_name(conn, log['artist']),
+            None if log['song'] is None else song_id_from_song_name(conn, log['song'].replace("'", "''")),
+            None if log['artist'] is None else artist_id_from_artist_name(conn, log['artist'].replace("'", "''")),
             log['sessionId'],
             None if log['location'] is None else log['location'].replace("'", "''"),
             None if log['userAgent'] is None else log['userAgent'].replace("'", "''"),
@@ -141,9 +140,9 @@ def main():
         if "song_data" in obj.key:
             process_song(obj.get()['Body'].read(), conn)
 
-    #for obj in bucket.objects.all():
-        #if "log_data" in obj.key:
-            #process_log(obj.get()['Body'].read().decode("utf-8"), conn)
+    for obj in bucket.objects.all():
+        if "log_data" in obj.key:
+            process_log(obj.get()['Body'].read().decode("utf-8"), conn)
 
 
     insert_artists_songs(conn)

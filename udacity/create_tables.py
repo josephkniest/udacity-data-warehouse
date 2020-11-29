@@ -61,14 +61,14 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists public.songplays (
-            start_time integer not null,
+            start_time bigint not null,
             user_id varchar(32) not null,
             level varchar(32),
             song_id varchar(32) not null,
             artist_id varchar(32) not null,
             session_id integer,
-            location varchar(32),
-            user_agent varchar(32),
+            location varchar(64),
+            user_agent varchar(256),
             foreign key(user_id) references public.users(user_id),
             foreign key(artist_id) references public.artists(artist_id),
             foreign key(song_id) references public.songs(song_id)
