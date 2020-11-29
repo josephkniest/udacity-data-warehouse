@@ -106,6 +106,33 @@ def insert_artists_songs(conn):
 
     conn.commit()
 
+def song_id_from_song_name(conn, song_name):
+    cur = conn.cursor()
+    cur.execute("select song_id from public.songs where title = '" + song_name + "'")
+    for record in cur:
+        return record[0]
+
+def artist_id_from_artist_name(conn, artist_name):
+    cur = conn.cursor()
+    cur.execute("select artist_id from public.artists where name = '" + artist_name + "'")
+    for record in cur:
+        return record[0]
+
+def insert_users_songplays(conn):
+    cur = conn.cursor()
+    cur.execute("""
+        insert into public.users
+            select user_id, first_name, last_name, gender, level
+            from stage_logs
+            left join public.users using(user_id, first_name, last_name, gender, level)
+            where public.users.user_id is null
+    """)
+
+    cur.execute("""
+        insert into public.songplays
+            select start_time, user_id, level, 
+    """)
+
 def main():
     conn = connect_redshift()
     create_temp_tables(conn)
@@ -119,6 +146,9 @@ def main():
 
 
     insert_artists_songs(conn)
+    print(song_id_from_song_name(conn, 'Soul Deep'))
+    #SOCIWDW12A8C13D406
+    print(artist_id_from_artist_name(conn, 'Kenny G featuring Daryl Hall'))
     conn.commit()
 
     conn.close()
