@@ -1,6 +1,6 @@
 from create_tables import connect_redshift, aws_module
 import json
-
+import datetime
 def create_temp_tables(conn):
 
 
@@ -94,13 +94,28 @@ def process_log(file, conn):
 
     """
 
-
+    dayOfTheWeek = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     jsonS = '[' + file.replace("}", "},")
     jsonS = jsonS[:-1] + ']'
     logs = json.loads(jsonS)
     cur = conn.cursor()
     for log in logs:
-        print(log)
+        dt = datetime.datetime.fromtimestamp(log["ts"] / 1000.0)
+        sql = """
+            insert into public.time (start_time, hour, day, week, month, year, weekday)
+            values ({}, {}, {}, {}, {}, {}, {})
+        """.format(
+            log['ts'],
+            dt.hour,
+            dt.day,
+            dt.isocalendar()[1],
+            dt.month,
+            dt.year,
+            dayOfTheWeek[dt.weekday()]
+        )
+
+        print(sql)
+
         sql = """
             insert into stage_logs (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent, first_name, last_name, gender)
             values ({}, '{}', '{}', '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}')
@@ -117,6 +132,7 @@ def process_log(file, conn):
             None if log['lastName'] is None else log['lastName'].replace("'", "''"),
             None if log['gender'] is None else log['gender'].replace("'", "''"))
 
+        print(sql)
         cur.execute(sql)
 
 def insert_artists_songs(conn):
