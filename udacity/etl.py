@@ -2,6 +2,19 @@ from create_tables import connect_redshift, aws_module
 import json
 
 def create_temp_tables(conn):
+
+
+    """create_temp_tables
+
+    Create the temporary redshift tables for storing the
+    raw data for later upsert
+
+    Parameters:
+    conn: Redshift session
+
+    """
+
+
     cur = conn.cursor()
     cur.execute("""
         create temp table if not exists stage_songs (
@@ -37,6 +50,18 @@ def create_temp_tables(conn):
 
 
 def process_song(file, conn):
+
+    """process_song
+
+    Process a song file by inserting it into the songs redshift temp table
+
+    Parameters:
+    file (string): Song file content
+    conn: Redshift session
+
+    """
+
+
     song = json.loads(file)
     cur = conn.cursor()
     print(song)
@@ -57,6 +82,19 @@ def process_song(file, conn):
 
 
 def process_log(file, conn):
+
+
+    """process_log
+
+    Process a log file by inserting it into the logs redshift temp table
+
+    Parameters:
+    file (string): Log file content
+    conn: Redshift session
+
+    """
+
+
     jsonS = '[' + file.replace("}", "},")
     jsonS = jsonS[:-1] + ']'
     logs = json.loads(jsonS)
@@ -82,6 +120,17 @@ def process_log(file, conn):
         cur.execute(sql)
 
 def insert_artists_songs(conn):
+
+    """insert_artists_songs
+
+    Process a temp song record by inserting song and artist rows therefrom
+
+    Parameters:
+    conn: Redshift session
+
+    """
+
+
     cur = conn.cursor()
     sql = """
         insert into public.artists
@@ -106,18 +155,52 @@ def insert_artists_songs(conn):
     conn.commit()
 
 def song_id_from_song_name(conn, song_name):
+
+    """song_id_from_song_name
+
+    Look up the ID of the song from its name
+
+    Parameters:
+    conn: Redshift session
+    song_name (string): Name of the song whose ID we need
+
+    """
+
     cur = conn.cursor()
     cur.execute("select song_id from public.songs where title = '" + song_name + "'")
     for record in cur:
         return record[0]
 
 def artist_id_from_artist_name(conn, artist_name):
+
+    """artist_id_from_artist_name
+
+    Look up the ID of the artist from its name
+
+    Parameters:
+    conn: Redshift session
+    song_name (string): Name of the artist whose ID we need
+
+    """
+
+
     cur = conn.cursor()
     cur.execute("select artist_id from public.artists where name = '" + artist_name + "'")
     for record in cur:
         return record[0]
 
 def insert_users_songplays(conn):
+
+    """insert_users_songplays
+
+    Create users and song play records from the songplay log events
+
+    Parameters:
+    conn: Redshift session
+
+    """
+
+
     cur = conn.cursor()
     cur.execute("""
         insert into public.users

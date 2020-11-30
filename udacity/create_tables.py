@@ -5,17 +5,42 @@ import configparser
 import psycopg2
 
 def aws_module(resource):
+
+    """aws_module
+
+    Allocate an AWS resource client
+
+    Parameters:
+    resource (string): Resource type, e.g. 'S3'
+
+    """
+
+
     file = open('./creds.json', "r")
     creds = json.loads(file.read())
     file.close()
     return boto3.resource(resource, aws_access_key_id=creds['keyId'], aws_secret_access_key=creds['keySec'])
 
 def connect_redshift():
+
+    """connect_redshift
+
+    Connect a redshift session
+
+    """
+
     config = configparser.ConfigParser()
     config.read('redshift.cfg')
     return psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
 
 def reset_tables():
+
+    """reset_tables
+
+    Drop all regular redshift tables then recreate them
+
+    """
+
     conn = connect_redshift()
     cur = conn.cursor()
 
