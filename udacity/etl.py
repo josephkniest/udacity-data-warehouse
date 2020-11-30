@@ -5,15 +5,16 @@ def create_temp_tables(conn):
     cur = conn.cursor()
     cur.execute("""
         create temp table if not exists stage_songs (
+            song_id varchar(32) not null,
             artist_id varchar(32),
             name varchar(128),
             location varchar(32),
             latitude integer,
             longitude integer,
-            song_id varchar(32),
             title varchar(128),
             year integer,
-            duration float
+            duration float,
+            primary key(song_id)
         )
     """)
 
@@ -29,7 +30,8 @@ def create_temp_tables(conn):
             user_agent varchar(256),
             first_name varchar(32),
             last_name varchar(32),
-            gender varchar(32)
+            gender varchar(32),
+            primary key(start_time)
         )
     """)
 
@@ -83,7 +85,7 @@ def insert_artists_songs(conn):
     cur = conn.cursor()
     sql = """
         insert into public.artists
-            select artist_id, name, location, latitude, longitude
+            select distinct artist_id, name, location, latitude, longitude
             from stage_songs
             left join public.artists using(artist_id, name, location, latitude, longitude)
             where public.artists.artist_id is null
@@ -93,7 +95,7 @@ def insert_artists_songs(conn):
 
     sql = """
         insert into public.songs
-            select song_id, title, artist_id, year, duration
+            select distinct song_id, title, artist_id, year, duration
             from stage_songs
             left join public.songs using(song_id, title, artist_id, year, duration)
             where public.songs.song_id is null

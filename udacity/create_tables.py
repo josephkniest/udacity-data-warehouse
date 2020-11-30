@@ -27,11 +27,11 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists public.users (
-            user_id varchar(32) not null,
-            first_name varchar(32) not null,
-            last_name varchar(32) not null,
-            gender varchar(32) not null,
-            level varchar(32) not null,
+            user_id varchar(32),
+            first_name varchar(32),
+            last_name varchar(32),
+            gender varchar(32),
+            level varchar(32),
             primary key(user_id)
         )
     """)
@@ -39,8 +39,8 @@ def reset_tables():
     cur.execute("""
         create table if not exists public.artists (
             artist_id varchar(32) not null,
-            name varchar(128) not null,
-            location varchar(32) not null,
+            name varchar(128),
+            location varchar(32),
             latitude integer,
             longitude integer,
             primary key(artist_id)
@@ -50,7 +50,7 @@ def reset_tables():
     cur.execute("""
         create table if not exists public.songs (
             song_id varchar(32) not null,
-            title varchar(128) not null,
+            title varchar(128),
             artist_id varchar(32) not null,
             year integer,
             duration float,
@@ -61,7 +61,7 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists public.songplays (
-            start_time bigint not null,
+            start_time bigint,
             user_id varchar(32) not null,
             level varchar(32),
             song_id varchar(32) not null,
@@ -77,15 +77,14 @@ def reset_tables():
 
     cur.execute("""
         create table if not exists public.time (
-            time_id integer not null identity(1, 1),
-            start_time integer not null,
-            hour integer not null,
-            day integer not null,
-            week integer not null,
-            month integer not null,
-            year integer not null,
-            weekday integer not null,
-            primary key(time_id)
+            start_time integer,
+            hour integer,
+            day integer,
+            week integer,
+            month integer,
+            year integer,
+            weekday integer,
+            primary key(start_time)
         )
     """)
 
